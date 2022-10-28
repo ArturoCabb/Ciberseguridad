@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tvA, tvB, tvP, tvG, tvCS, tvPA;
     private Button btnInit;
-    private static final String IP = "10.49.64.182";
+    private static final String IP = "192.168.1.78";
     private SSLSocket socket = null;
     private long Adash;
     private StringBuilder hexString;
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         Log.println(Log.ASSERT, "OK", "Iniciando ultimo calculo");
-        long Adash = Diffie_helman_Complementario(B, a, P);
+        long Adash = Diffie_Helman_Client(B, a, P);
         tvCS.setText("Código secreto: " + Long.toString(Adash));
     }
 
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         Log.println(Log.ASSERT, "OK", "Iniciando ultimo calculo");
-        Adash = Diffie_helman_Complementario(B, a, P);
+        Adash = Diffie_Helman_Client(B, a, P);
         tvCS.setText("Código secreto: " + Long.toString(Adash));
         segundaParte();
     }
@@ -191,10 +191,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         hexString.toString();
-    }
-
-    private long Diffie_helman_Complementario(long B, long a, long P) {
-        return calculatePower(B, a, P);
     }
 
     private long Diffie_Helman_Client(long G, Long a, Long P) {

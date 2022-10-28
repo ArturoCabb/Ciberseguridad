@@ -1,7 +1,12 @@
 import java.net.*;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+
 import java.io.*;
 
 public class ServerToAndroid {
+    private static SSLServerSocket serverSocket = null;
     public static void main(String[] args) {
         try {
             int port = 8080;
@@ -14,30 +19,36 @@ public class ServerToAndroid {
             String Bstr;
   
             // Established the Connection
-            ServerSocket serverSocket = new ServerSocket(port);
+            //ServerSocket serverSocket = new ServerSocket(port);
+            SSLServerSocketFactory socketFactory = (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
+            serverSocket = (SSLServerSocket) socketFactory.createServerSocket(port);
             System.out.println("Waiting for client on port " + serverSocket.getLocalPort() + "...");
-            Socket server = serverSocket.accept();
-            System.out.println("Just connected to " + server.getRemoteSocketAddress());
+            //Socket server = serverSocket.accept();
+            SSLSocket socket = (SSLSocket) serverSocket.accept();
+            System.out.println("Just connected to " + socket.getRemoteSocketAddress());
   
             // Server's Private Key
             System.out.println("From Server : Private Key = " + b);
   
             // Accepts the data from client
-            BufferedReader entrada = new BufferedReader(new InputStreamReader(server.getInputStream()));
-            String mensajeServidor;
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             clientP = Integer.parseInt(entrada.readLine());
+            System.out.println("From Client : P = " + clientP);
             clientG = Integer.parseInt(entrada.readLine());
+            System.out.println("From Client : G = " + clientG);
             clientA = Integer.parseInt(entrada.readLine());
+            System.out.println("From Client : Public Key = " + clientA);
+
             //DataInputStream in = new DataInputStream(server.getInputStream());
   
-            //clientP = Integer.parseInt(in.readUTF()); // to accept p
-            System.out.println("From Client : P = " + clientP);
+            //clientP = Integer.parseInt(in.readUTF()); // to accept p p es cualquier numero que quiera mientras sea primo
+            //System.out.println("From Client : P = " + clientP);
   
-            //clientG = Integer.parseInt(in.readUTF()); // to accept g
-            System.out.println("From Client : G = " + clientG);
+            //clientG = Integer.parseInt(in.readUTF()); // to accept g g es un valor acordado
+            //System.out.println("From Client : G = " + clientG);
   
             //clientA = Double.parseDouble(in.readUTF()); // to accept A
-            System.out.println("From Client : Public Key = " + clientA);
+            //System.out.println("From Client : Public Key = " + clientA);
   
             B = ((Math.pow(clientG, b)) % clientP); // calculation of B
             Bstr = Double.toString(B);
@@ -45,7 +56,7 @@ public class ServerToAndroid {
   
             // Sends data to client
             // Value of B
-            OutputStream outToclient = server.getOutputStream();
+            OutputStream outToclient = socket.getOutputStream();
             DataOutputStream out = new DataOutputStream(outToclient);
   
             out.writeUTF(Bstr); // Sending B
@@ -55,7 +66,9 @@ public class ServerToAndroid {
   
             System.out.println("Secret Key to perform Symmetric Encryption = "
                                + Bdash);
-            server.close();
+            //server.close();
+            out.close();
+            socket.close();
         }
   
         catch (SocketTimeoutException s) {
